@@ -10,7 +10,7 @@
   </parent>
  -->
   <groupId>com.redhat.gpe.training</groupId>
-  <artifactId>fis-camel-rest-s2i</artifactId>
+  <artifactId>fis-camel-jetty-s2i</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
 
