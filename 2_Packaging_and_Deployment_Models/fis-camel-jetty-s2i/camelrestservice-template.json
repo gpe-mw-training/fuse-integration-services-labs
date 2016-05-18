@@ -4,16 +4,16 @@
   "labels": {},
   "metadata": {
     "annotations": {
-      "description": "# CDI Camel Create Order Service \n\n",
+      "description": "# CDI Camel Jetty  Service \n\n",
       "iconClass": "icon-java"
     },
     "labels": {},
-    "name": "fis-createorderservices"
+    "name": "fis-camel-jetty-s2i"
   },
   "parameters": [
     {
       "name": "APP_NAME",
-      "value": "fis-createorderservices",
+      "value": "fis-camel-jetty-s2i",
       "description": "Application Name"
     },
     {
@@ -28,7 +28,7 @@
     },
     {
       "name": "SERVICE_NAME",
-      "value": "fis-createorder-service",
+      "value": "fis-cameljetty-service",
       "description": "Exposed Service name"
     },
     {
