@@ -4,7 +4,7 @@
   "labels": {},
   "metadata": {
     "annotations": {
-      "description": "# CDI Camel Jetty  Service \n\n",
+      "description": "# CDI Camel Jetty Route Service \n\n",
       "iconClass": "icon-java"
     },
     "labels": {},
@@ -27,8 +27,13 @@
       "description": "Git ref to build"
     },
     {
+      "name": "CONTEXT_DIR",
+      "value": "/",
+      "description": "Git context directory of project to build"
+    },
+    {
       "name": "SERVICE_NAME",
-      "value": "fis-cameljetty-service",
+      "value": "fis-createorder-service",
       "description": "Exposed Service name"
     },
     {
@@ -181,6 +186,7 @@
         ],
         "source": {
           "type": "Git",
+          "contextDir": "${CONTEXT_DIR}",
           "git": {
             "uri": "${GIT_REPO}",
             "ref": "${GIT_REF}"
