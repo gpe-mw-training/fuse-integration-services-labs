@@ -13,7 +13,7 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.redhat.gpte.training.JettyCamel;
+package com.redhat.gpe.training.fis;
 
 import io.fabric8.arquillian.kubernetes.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;

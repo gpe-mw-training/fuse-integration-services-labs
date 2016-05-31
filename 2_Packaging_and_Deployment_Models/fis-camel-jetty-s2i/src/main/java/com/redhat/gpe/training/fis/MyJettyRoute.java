@@ -13,7 +13,7 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.redhat.gpte.training.JettyCamel;
+package com.redhat.gpe.training.fis;
 
 import javax.inject.Inject;
 
@@ -25,23 +25,22 @@ import org.apache.camel.cdi.Uri;
 /**
  * Configures all our Camel routes, components, endpoints and beans
  */
-@ContextName("myCamelContext")
+@ContextName("myJettyCamel")
 public class MyJettyRoute extends RouteBuilder {
 
-    @Inject @Uri("jetty:http://0.0.0.0:9191/CreateOrder")
+    @Inject @Uri("jetty:http://0.0.0.0:8080/camel/hello")
     private Endpoint jettyEndpoint;
 
     @Override
     public void configure() throws Exception {
         // you can configure the route rule with Java DSL here
-    	
+
         from(jettyEndpoint)
-        .to("direct:PutOrder")
-        .setBody().simple("Hello on Fuse Integration Service\n");
-        
-        from("direct:PutOrder")
-        .to("log:order12345?showAll=true&multiline=true");
-        
+            .choice()
+                .when(header("name"))
+                    .transform(simple("Hello ${header.name} I am ${sysenv.HOSTNAME} how are you?"))
+                .otherwise()
+                    .transform(constant("Add a name parameter to uri, eg ?name=foo"));
     }
 
 }

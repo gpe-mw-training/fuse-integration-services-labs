@@ -10,7 +10,7 @@
         <version>1.0</version>
     </parent>
 
-    <artifactId>fuse-camel-webservice</artifactId>
+    <artifactId>fis-camel-webservice</artifactId>
     <name>RedHat GPE Training :: FIS :: Lab :: 3 :: Webservice</name>
     <packaging>bundle</packaging>
 
@@ -42,6 +42,25 @@
     <fabric8.iconRef>karaf</fabric8.iconRef>
   </properties>
 
+<dependencyManagement>
+    <dependencies>
+        <!-- fabric8 bom must be before fabric8 bom -->
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>fabric8-project-bom-with-platform-deps</artifactId>
+            <version>${fabric8.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.fuse.bom</groupId>
+            <artifactId>jboss-fuse-parent</artifactId>
+            <version>${fuse.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
 
     <dependencies>
         <!-- cxf -->

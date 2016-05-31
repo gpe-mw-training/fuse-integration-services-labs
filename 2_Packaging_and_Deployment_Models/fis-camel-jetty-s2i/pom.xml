@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <!-- 
+
   <parent>
     <artifactId>fis-lab2-project</artifactId>
     <groupId>com.redhat.gpe.training</groupId>
     <version>1.0</version>
   </parent>
- -->
+
   <groupId>com.redhat.gpe.training</groupId>
   <artifactId>fis-camel-jetty-s2i</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>RedHat GPE Training :: FIS :: Lab 2 :: CDI Camel HTTP service on FIS</name>
+  <name>Fabric8 :: Quickstarts :: CDI :: Camel with Jetty as HTTP server</name>
   <description>Camel route using CDI in a standalone Java Container using Jetty as HTTP server</description>
 
   <properties>
@@ -26,24 +26,21 @@
     <fabric8.version>2.2.0.redhat-079</fabric8.version>
     <docker.maven.plugin.version>0.13.6</docker.maven.plugin.version>
 
-	<http.port>9191</http.port>
-	
     <!-- Docker & Fabric8 Configs -->
     <docker.from>jboss-fuse-6/fis-java-openshift:1.0</docker.from>
     <fabric8.dockerUser>fabric8/</fabric8.dockerUser>
     <docker.image>${fabric8.dockerUser}${project.artifactId}:${project.version}</docker.image>
     <docker.port.container.jolokia>8778</docker.port.container.jolokia>
-    <!-- docker.port.container.http>8080</docker.port.container.http-->
+    <docker.port.container.http>8080</docker.port.container.http>
 
     <fabric8.service.name>qs-cdi-camel-jetty</fabric8.service.name>
-    <fabric8.service.port>80</fabric8.service.port>
-    <fabric8.service.containerPort>${http.port}</fabric8.service.containerPort>
+    <fabric8.service.port>9102</fabric8.service.port>
+    <fabric8.service.containerPort>8080</fabric8.service.containerPort>
 
     <fabric8.label.component>${project.artifactId}</fabric8.label.component>
     <fabric8.label.container>java</fabric8.label.container>
     <fabric8.label.group>quickstarts</fabric8.label.group>
     <fabric8.iconRef>camel</fabric8.iconRef>
-    
   </properties>
 
   <dependencyManagement>
@@ -53,6 +50,13 @@
         <groupId>io.fabric8</groupId>
         <artifactId>fabric8-project-bom-with-platform-deps</artifactId>
         <version>${fabric8.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.fuse.bom</groupId>
+        <artifactId>jboss-fuse-parent</artifactId>
+        <version>${fuse.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -218,11 +222,7 @@
                 <env>
                   <JAVA_LIB_DIR>/deployments/lib</JAVA_LIB_DIR>
                   <JAVA_MAIN_CLASS>org.apache.camel.cdi.Main</JAVA_MAIN_CLASS>
-                  <HTTP_PORT>${http.port}</HTTP_PORT>
-				</env>
-					<ports>
-					  <port>${http.port}</port>
-					</ports>
+                </env>
               </build>
             </image>
           </images>
