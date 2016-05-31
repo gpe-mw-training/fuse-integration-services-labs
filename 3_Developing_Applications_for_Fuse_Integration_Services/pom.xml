@@ -14,7 +14,7 @@
     <name>RedHat GPE Training :: FIS :: Lab 3 :: Project</name>
     
     <modules>
-
+	<module>camel-webservice</module>
     </modules>
     
 </project>
