@@ -4,16 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>fis-lab2-project</artifactId>
+    <artifactId>fis-lab3-project</artifactId>
     <groupId>com.redhat.gpe.training</groupId>
     <version>1.0</version>
   </parent>
 
   <version>1.0</version>
   <groupId>com.redhat.gpe.training</groupId>
-  <artifactId>fis-camel-rest-m2</artifactId>
+  <artifactId>camel-rest</artifactId>
   <packaging>bundle</packaging>
-  <name>RedHat GPE Training :: FIS :: Lab 2 :: Karaf CXF REST</name>
+  <name>RedHat GPE Training :: FIS :: Lab 3 :: CXF REST</name>
   <description>REST example using CXF in Karaf container</description>
 
   <properties>
@@ -28,7 +28,7 @@
     <karaf.plugin.version>4.0.2.redhat-621079</karaf.plugin.version>
 
     <docker.from>jboss-fuse-6/fis-karaf-openshift:1.0</docker.from>
-    <fabric8.dockerUser>sjayanti/</fabric8.dockerUser>
+    <fabric8.dockerUser>fabric8/</fabric8.dockerUser>
     <docker.image>${fabric8.dockerUser}${project.artifactId}:${project.version}</docker.image>
     <docker.assemblyDescriptor>${basedir}/src/main/fabric8/assembly.xml</docker.assemblyDescriptor>
     <docker.port.container.jolokia>8778</docker.port.container.jolokia>

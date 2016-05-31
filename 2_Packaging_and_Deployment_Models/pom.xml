@@ -14,7 +14,7 @@
 
     <modules>
         <module>fis-camel-jetty-s2i</module>
-        <module>fis-camel-rest-m2</module>
+        <module>fis-cdi-cxf-ws</module>
   </modules>
     
 </project>
