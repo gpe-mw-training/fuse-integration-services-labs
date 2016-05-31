@@ -13,8 +13,8 @@
     <version>1.0</version>
 
     <modules>
-        <module>fis-camel-rest</module>
         <module>fis-camel-jetty-s2i</module>
+        <module>fis-camel-rest-m2</module>
   </modules>
     
 </project>

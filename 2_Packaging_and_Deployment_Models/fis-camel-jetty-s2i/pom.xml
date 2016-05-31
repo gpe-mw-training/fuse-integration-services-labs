@@ -14,7 +14,7 @@
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Fabric8 :: Quickstarts :: CDI :: Camel with Jetty as HTTP server</name>
+  <name>RedHat GPE Training :: FIS :: Lab 2 :: Camel with Jetty as HTTP server</name>
   <description>Camel route using CDI in a standalone Java Container using Jetty as HTTP server</description>
 
   <properties>
