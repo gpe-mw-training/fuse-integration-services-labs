@@ -13,8 +13,6 @@
     <version>1.0</version>
 
     <modules>
-        <module>fis-camel-jetty-s2i</module>
-        <module>fis-cdi-cxf-ws</module>
   </modules>
     
 </project>

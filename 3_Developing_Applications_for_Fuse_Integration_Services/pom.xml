@@ -13,7 +13,6 @@
     
     <modules>
 	<module>camel-webservice</module>
-        <module>camel-rest</module>
   </modules>
     
 </project>
