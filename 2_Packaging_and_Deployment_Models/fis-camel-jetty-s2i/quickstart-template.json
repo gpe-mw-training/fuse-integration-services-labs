@@ -27,6 +27,10 @@
       "description": "Git ref to build"
     },
     {
+      "name": "CONTEXT_DIR",
+      "description": "Set this to the relative path to your project if it is not in the root of your repository"
+    },
+    {
       "name": "SERVICE_NAME",
       "value": "s2i-qs-cdi-camel-jetty",
       "description": "Exposed Service name"
@@ -187,7 +191,8 @@
           "git": {
             "uri": "${GIT_REPO}",
             "ref": "${GIT_REF}"
-          }
+          },
+	  "contextDir": "${CONTEXT_DIR}"
         },
         "strategy": {
           "type": "Source",

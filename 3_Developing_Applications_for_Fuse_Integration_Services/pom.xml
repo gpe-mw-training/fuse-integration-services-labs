@@ -8,6 +8,7 @@
     </parent>
     
     <packaging>pom</packaging>
+    <groupId>com.redhat.gpe.training</groupId>
     <artifactId>fis-lab3-project</artifactId>
     <name>RedHat GPE Training :: FIS :: Lab 3 :: Project</name>
     
