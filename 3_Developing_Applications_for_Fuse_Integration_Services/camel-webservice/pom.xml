@@ -165,7 +165,7 @@
         <version>2.18.1</version>
       </plugin>
 
-      <!-- Need to setup the OSGi meta information here -->
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -191,34 +191,6 @@
           </instructions>
         </configuration>
       </plugin>
-
-            <!-- to generate the MANIFEST-FILE required by the bundle -->
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Import-Package>
-                            META-INF.cxf,
-                            org.xmlsoap.schemas.soap.envelope,
-                            org.slf4j,
-                            *
-                        </Import-Package>
-                        <DynamicImport-Package>
-                            org.apache.cxf.*,
-                            org.springframework.beans.*
-                        </DynamicImport-Package>
-                        <Private-Package>
-                            com.redhat.gpe.training.camel
-                        </Private-Package>
-                        <Export-Package>
-                        </Export-Package>
-                        <_failok>true</_failok>
-                    </instructions>
-                </configuration>
-            </plugin>
 
             <!-- CXF wsdl2java generator, will plugin to the compile goal -->
             <plugin>
