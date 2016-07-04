@@ -103,50 +103,51 @@
     </dependencies>
 
     <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
-      </plugin>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
 
-<!-- to generate the MANIFEST-FILE required by the bundle -->
-<plugin>
-    <groupId>org.apache.felix</groupId>
-    <artifactId>maven-bundle-plugin</artifactId>
-    <extensions>true</extensions>
-    <configuration>
-        <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Import-Package>
-                META-INF.cxf,
-                org.xmlsoap.schemas.soap.envelope,
-                org.slf4j,
-                *
-            </Import-Package>
-            <DynamicImport-Package>
-                org.apache.cxf.*,
-                org.springframework.beans.*
-            </DynamicImport-Package>
-            <Private-Package>
-                com.redhat.gpe.training.camel
-            </Private-Package>
-            <Export-Package>
-            </Export-Package>
-            <_failok>true</_failok>
-        </instructions>
-    </configuration>
-</plugin>
+        <plugins>
+            <!-- enable maven command 'mvn camel:run' -->
+            <plugin>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-maven-plugin</artifactId>
+                <configuration>
+                    <fileApplicationContextUri>src/main/resources/META-INF/spring/spring-camel-context.xml
+                    </fileApplicationContextUri>
+                </configuration>
+            </plugin>
 
 
+            <!-- to generate the MANIFEST-FILE required by the bundle -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>
+                            META-INF.cxf,
+                            org.xmlsoap.schemas.soap.envelope,
+                            org.slf4j,
+                            *
+                        </Import-Package>
+                        <DynamicImport-Package>
+                            org.apache.cxf.*,
+                            org.springframework.beans.*
+                        </DynamicImport-Package>
+                        <Private-Package>
+                            com.redhat.gpe.training.camel
+                        </Private-Package>
+                        <Export-Package>
+                        </Export-Package>
+                        <_failok>true</_failok>
+                    </instructions>
+                </configuration>
+            </plugin>
             <!-- CXF wsdl2java generator, will plugin to the compile goal -->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
