@@ -186,6 +186,7 @@
               com.fasterxml.jackson.core,
               com.fasterxml.jackson.databind,
               com.fasterxml.jackson.jaxrs.json,
+	      org.xmlsoap.schemas.soap.envelope,
               *</Import-Package>
             <Export-Package>com.redhat.gpe.training</Export-Package>
           </instructions>
