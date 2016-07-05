@@ -151,52 +151,41 @@
             </resource>
         </resources>
       <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
-      </plugin>
 
-
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>${version.maven-bundle-plugin}</version>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Import-Package>javax.ws.rs;version="[2,3)",
-              javax.ws.rs.core;version="[2,3)",
-              javax.ws.rs.ext;version="[2,3)",
-              javax.xml.bind.annotation,
-              org.osgi.service.blueprint,
-              io.swagger.jaxrs.config,
-              io.swagger.jaxrs.listing,
-              io.swagger.annotations,
-              org.apache.cxf.transport.http,
-              com.fasterxml.jackson.annotation,
-              com.fasterxml.jackson.core,
-              com.fasterxml.jackson.databind,
-              com.fasterxml.jackson.jaxrs.json,
-	      org.xmlsoap.schemas.soap.envelope,
-              *</Import-Package>
-            <Export-Package>com.redhat.gpe.training</Export-Package>
-          </instructions>
-        </configuration>
-      </plugin>
+            <!-- to generate the MANIFEST-FILE required by the bundle -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>
+                            META-INF.cxf,
+                            org.xmlsoap.schemas.soap.envelope,
+                            org.slf4j,
+                            *
+                        </Import-Package>
+                        <DynamicImport-Package>
+                            org.apache.cxf.*,
+                            org.springframework.beans.*
+                        </DynamicImport-Package>
+                        <Private-Package>
+                            com.redhat.gpe.training.camel
+                        </Private-Package>
+                        <Export-Package>
+                            com.redhat.gpe.training
+                        </Export-Package>
+                        <_failok>true</_failok>
+                    </instructions>
+                </configuration>
+            </plugin>
 
             <!-- CXF wsdl2java generator, will plugin to the compile goal -->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
+      		<version>${cxf.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
