@@ -143,6 +143,7 @@
                             com.redhat.gpe.training.camel
                         </Private-Package>
                         <Export-Package>
+			    com.redhat.gpe.training
                         </Export-Package>
                         <_failok>true</_failok>
                     </instructions>
