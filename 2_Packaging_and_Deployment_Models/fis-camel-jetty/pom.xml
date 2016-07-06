@@ -2,20 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-<!--
+
   <parent>
     <artifactId>fis-lab2-project</artifactId>
     <groupId>com.redhat.gpe.training</groupId>
     <version>1.0</version>
   </parent>
--->
 
   <groupId>com.redhat.gpe.training</groupId>
-  <artifactId>fis-camel-jetty-s2i</artifactId>
+  <artifactId>fis-camel-jetty</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>RedHat GPE Training :: FIS :: Lab 2 :: Camel with Jetty as HTTP server</name>
+  <name>Fabric8 :: Quickstarts :: CDI :: Camel with Jetty as HTTP server</name>
   <description>Camel route using CDI in a standalone Java Container using Jetty as HTTP server</description>
 
   <properties>

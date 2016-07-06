@@ -192,7 +192,7 @@
             "uri": "${GIT_REPO}",
             "ref": "${GIT_REF}"
           },
-	  "contextDir": "${CONTEXT_DIR}"
+          "contextDir": "${CONTEXT_DIR}"
         },
         "strategy": {
           "type": "Source",
