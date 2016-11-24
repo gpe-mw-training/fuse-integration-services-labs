@@ -19,11 +19,17 @@
     {
       "name": "GIT_REPO",
       "required": true,
+      "value": "https://github.com/gpe-mw-training/fuse-integration-services-labs",
       "description": "Git repository, required"
     },
     {
+      "name": "CONTEXT_DIR",
+      "value": "/2_Packaging_and_Deployment_Models/fis-camel-log",
+      "description": "Set this to the relative path to your project if it is not in the root of your repository"
+    },
+    {
       "name": "GIT_REF",
-      "value": "master",
+      "value": “solution”,
       "description": "Git ref to build"
     },
     {
@@ -130,7 +136,8 @@
           "git": {
             "uri": "${GIT_REPO}",
             "ref": "${GIT_REF}"
-          }
+          },
+          "contextDir": "${CONTEXT_DIR}"
         },
         "strategy": {
           "type": "Source",
