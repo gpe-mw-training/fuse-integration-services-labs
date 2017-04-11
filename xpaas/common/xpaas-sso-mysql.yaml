@@ -1,0 +1,297 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: xpaas-sso-mysql-persistent
+  group: xpaas
+metadata:
+  annotations:
+    description: Application template for SSO 7.0 MySQL applications with persistent storage
+    tags: sso,keycloak,mysql,java,database,jboss,xpaas
+  name: xpaas-sso-mysql-persistent
+parameters:
+- name: APPLICATION_NAME
+  description: 
+  value: rhsso
+  required: true
+- name: SERVICE_ACCOUNT_NAME
+  description: The name of the service account to use for the deployment.  The service account should be configured to allow useage of the secret(s) specified by HTTPS_SECRET.
+  value: sso-service-account
+  required: true
+- name: DB_JNDI
+  description: Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/mysql
+  value: java:jboss/datasources/KeycloakDS
+  required: false
+- name: DB_USERNAME
+  description: Database user name
+  from: 'user[a-zA-Z0-9]{3}'
+  generate: expression
+  required: true
+- name: DB_PASSWORD
+  description: Database user password.
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  required: true  
+- name: DB_DATABASE
+  description: Database name.
+  value: keycloak
+  required: true
+- name: SERVICE_ACCOUNT_NAME
+  description": The name of the service account to use for the deployment.  The service account should be configured to allow useage of the secret(s) specified by HTTPS_SECRET and JGROUPS_ENCRYPT_SECRET.
+  value: sso-service-account
+  required: true
+- name: HTTPS_SECRET
+  description: The name of the secret containing the keystore file.
+  value: sso-app-secret
+  required: false
+- name: HTTPS_KEYSTORE
+  description: The name of the keystore file within the secret.
+  value: keystore.jks
+  required: false
+- name: HTTPS_KEYSTORE_TYPE
+  description: The type of the keystore file (JKS or JCEKS).
+  required: false
+- name: HTTPS_PASSWORD
+  description: The password for the keystore and certificate (e.g. mykeystorepass).
+  required: false
+- name: SSO_ADMIN_USERNAME
+  description: SSO Server admin username.
+  value: admin
+  required: false
+- name: SSO_ADMIN_PASSWORD
+  description: SSO Server admin password.
+  value: admin
+  required: false
+- name: SSO_TRUSTSTORE
+  description: The name of the truststore file within the secret (e.g. truststore.jks).
+  required: false
+- name: SSO_TRUSTSTORE_PASSWORD
+  description: The password for the truststore and certificate (e.g. mykeystorepass)
+  required: false
+- name:   SSO_TRUSTSTORE_SECRET
+  description: The name of the secret containing the truststore file (e.g. truststore-secret). Used for volume secretName.
+  value: sso-app-secret
+  required: false
+- name: MYSQL_LOWER_CASE_TABLE_NAMES
+  description: Sets how the table names are stored and compared.
+  value: '1'
+  required: false
+objects:
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - port: 8443
+      targetPort: 8443
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}-mysql
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - port: 3306
+      targetPort: 3306
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}-mysql
+- kind: Route
+  apiVersion: v1
+  metadata:
+    annotations:
+      description: Route for applications's https service.
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}
+    tls:
+      termination: "passthrough"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          namespace: openshift
+          name: redhat-sso70-openshift:1.3
+    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}
+    template:
+      metadata:
+        name: ${APPLICATION_NAME}
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentconfig: ${APPLICATION_NAME}
+      spec:
+        serviceAccountName: ${SERVICE_ACCOUNT_NAME}
+        terminationGracePeriodSeconds: 75
+        containers:
+        - name: ${APPLICATION_NAME}
+          image: ${APPLICATION_NAME}
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: eap-keystore-volume
+            mountPath: /etc/eap-secret-volume
+            readOnly: true
+          - name: sso-truststore-volume
+            mountPath: /etc/sso-secret-volume
+            readOnly: true
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /opt/eap/bin/jboss-cli.sh
+                - -c
+                - :shutdown(timeout=60)
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /opt/eap/bin/livenessProbe.sh
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /opt/eap/bin/readinessProbe.sh
+            periodSeconds: 30
+          ports:
+          - name: jolokia
+            containerPort: 8778
+            protocol: TCP
+          - name: http
+            containerPort: 8080
+            protocol: TCP        
+          - name: https
+            containerPort: 8443
+            protocol: TCP
+          env:
+          - name: DB_SERVICE_PREFIX_MAPPING
+            value: ${APPLICATION_NAME}-mysql=DB
+          - name: DB_JNDI
+            value: ${DB_JNDI}
+          - name: DB_USERNAME
+            value: ${DB_USERNAME}
+          - name: DB_PASSWORD
+            value: ${DB_PASSWORD}
+          - name: DB_DATABASE
+            value: ${DB_DATABASE}
+          - name: HTTPS_KEYSTORE_DIR
+            value: /etc/eap-secret-volume
+          - name: HTTPS_KEYSTORE
+            value: ${HTTPS_KEYSTORE}
+          - name: HTTPS_KEYSTORE_TYPE
+            value: ${HTTPS_KEYSTORE_TYPE}
+          - name: HTTPS_NAME
+            value: ${HTTPS_NAME}
+          - name: HTTPS_PASSWORD
+            value: ${HTTPS_PASSWORD}
+          - name: SSO_ADMIN_USERNAME
+            value: ${SSO_ADMIN_USERNAME}
+          - name: SSO_ADMIN_PASSWORD
+            value: ${SSO_ADMIN_PASSWORD}
+          - name: SSO_TRUSTSTORE
+            value: ${SSO_TRUSTSTORE}
+          - name: SSO_TRUSTSTORE_DIR
+            value: /etc/sso-secret-volume
+          - name: SSO_TRUSTSTORE_PASSWORD
+            value: ${SSO_TRUSTSTORE_PASSWORD}
+        volumes:
+        - name: eap-keystore-volume
+          secret:
+            secretName: ${HTTPS_SECRET}
+        - name: sso-truststore-volume
+          secret:
+            secretName: ${SSO_TRUSTSTORE_SECRET}
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-mysql
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}-mysql
+        from:
+          kind: ImageStreamTag
+          name: mysql:latest
+          namespace: openshift
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}-mysql
+    template:
+      metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentConfig: ${APPLICATION_NAME}-mysql
+        name: ${APPLICATION_NAME}-mysql
+      spec:
+        containers:
+        - name: ${APPLICATION_NAME}-mysql
+          image: mysql
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 3306
+            protocol: TCP
+          volumeMounts:
+          - mountPath: /var/lib/mysql/data
+            name: ${APPLICATION_NAME}-mysql-data     
+          env:
+          - name: MYSQL_USER
+            value: ${DB_USERNAME}
+          - name: MYSQL_PASSWORD
+            value: ${DB_PASSWORD}
+          - name: MYSQL_DATABASE
+            value: ${DB_DATABASE}
+          - name: MYSQL_LOWER_CASE_TABLE_NAMES
+            value: ${MYSQL_LOWER_CASE_TABLE_NAMES}
+        volumes:
+        - name: ${APPLICATION_NAME}-mysql-data
+          emptyDir: {}
+        terminationGracePeriodSeconds: 60   
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: ${APPLICATION_NAME}-mysql-pvc
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${VOLUME_CAPACITY}

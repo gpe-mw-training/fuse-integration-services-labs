@@ -1,0 +1,279 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: xpaas-gogs-peristent
+  group: xpaas
+metadata:
+  annotations:
+    description: Creates a Gogs Git server for the xpaas labs
+    tags: instant-app,gogs,xpaas
+  name: xpaas-gogs-persistent
+parameters:
+- description: The name for the application.
+  name: APPLICATION_NAME
+  required: true
+  value: gogs
+- description: Username for PostgreSQL backend
+  displayName: PostgreSQL User
+  from: user[A-Z0-9]{3}
+  generate: expression
+  name: POSTGRESQL_USER
+  required: true
+- description: Password for Gogs Git Server PostgreSQL backend
+  displayName: Gogs' PostgreSQL Password
+  from: '[a-zA-Z0-9]{16}'
+  generate: expression
+  name: GOGS_POSTGRESQL_PASSWORD
+  required: true
+- description: Volume space available for data, e.g. 512Mi, 2Gi
+  name: VOLUME_CAPACITY
+  required: true
+  value: 512Mi
+objects:
+#gogs
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: ${APPLICATION_NAME}-postgresql-pvc
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${VOLUME_CAPACITY}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: ${APPLICATION_NAME}-pvc
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: ${VOLUME_CAPACITY}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The Gogs server's http port
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - name: web
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: postgresql-${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - name: postgresql
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: postgresql-${APPLICATION_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for gogs's http service.
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+    tags:
+    - annotations:
+        description: The Gogs git server docker image
+        tags: gogs,go,golang
+        version: "latest"
+      from:
+        kind: DockerImage
+        name: openshiftdemos/gogs:latest
+      importPolicy: {}
+      name: "latest"
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentconfig: ${APPLICATION_NAME}
+      spec:
+        containers:
+        - image: " "
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            httpGet:
+              port: 3000
+              path: /
+            timeoutSeconds: 1
+          name: gogs
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            httpGet:
+              port: 3000
+              path: /
+            timeoutSeconds: 1
+          volumeMounts:
+          - mountPath: /home/gogs/gogs-repositories
+            name: ${APPLICATION_NAME}-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: ${APPLICATION_NAME}-data
+          persistentVolumeClaim:
+            claimName: ${APPLICATION_NAME}-pvc
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APPLICATION_NAME}:latest
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: postgresql-${APPLICATION_NAME}
+    name: postgresql-${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: postgresql-${APPLICATION_NAME}
+    strategy:
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentconfig: postgresql-${APPLICATION_NAME}
+      spec:
+        containers:
+        - env:
+          - name: POSTGRESQL_USER
+            value: ${POSTGRESQL_USER}
+          - name: POSTGRESQL_PASSWORD
+            value: ${GOGS_POSTGRESQL_PASSWORD}
+          - name: POSTGRESQL_DATABASE
+            value: gogs
+          image: registry.access.redhat.com/rhscl/postgresql-94-rhel7:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 5432
+            timeoutSeconds: 1
+          name: postgresql-${APPLICATION_NAME}
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c
+                'SELECT 1'
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/lib/pgsql/data
+            name: postgresql-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: postgresql-data
+          persistentVolumeClaim:
+            claimName: ${APPLICATION_NAME}-postgresql-pvc
+    triggers:
+    - imageChangeParams:
+        containerNames:
+        - postgresql-${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          name: postgresql:latest
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+  status: {}
