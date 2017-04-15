@@ -86,11 +86,4 @@
     <activeProfile>fis-online-repos</activeProfile>
   </activeProfiles>
 
-<servers>
-  <server>
-    <id>index.docker.io</id>
-    <username>user</username>
-    <password>password</password>
-  </server>
-</servers>
 </settings>

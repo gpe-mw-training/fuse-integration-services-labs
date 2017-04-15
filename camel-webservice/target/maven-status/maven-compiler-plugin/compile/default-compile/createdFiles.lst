@@ -1,0 +1,13 @@
+com/redhat/gpe/training/GetCustomerByNameResponse.class
+com/redhat/gpe/training/camel/BeanService.class
+com/redhat/gpe/training/package-info.class
+com/redhat/gpe/training/CustomerService_Service.class
+com/redhat/gpe/training/NoSuchCustomerException.class
+com/redhat/gpe/training/GetAllCustomersResponse.class
+com/redhat/gpe/training/Customer.class
+com/redhat/gpe/training/GetCustomerByName.class
+com/redhat/gpe/training/ObjectFactory.class
+com/redhat/gpe/training/CustomerService.class
+com/redhat/gpe/training/NoSuchCustomer.class
+com/redhat/gpe/training/SaveCustomer.class
+com/redhat/gpe/training/CustomerType.class
