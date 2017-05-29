@@ -87,6 +87,20 @@
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>jboss-early-access-plugin-repository</id>
+            <name>Red Hat JBoss Fuse Early Access Plugin repository (all)</name>
+            <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
       </pluginRepositories>
     </profile>
   </profiles>
