@@ -118,7 +118,7 @@ objects:
         version: "latest"
       from:
         kind: DockerImage
-        name: openshiftdemos/gogs:latest
+        name: openshiftdemos/gogs:0.9.97
       importPolicy: {}
       name: "latest"
 - apiVersion: v1
