@@ -145,7 +145,7 @@ objects:
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
             httpGet:
@@ -160,7 +160,7 @@ objects:
           terminationMessagePath: /dev/termination-log
           readinessProbe:
             failureThreshold: 3
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
             httpGet:
